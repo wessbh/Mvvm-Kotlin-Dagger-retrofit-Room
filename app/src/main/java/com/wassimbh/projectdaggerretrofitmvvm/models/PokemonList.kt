@@ -15,4 +15,5 @@ import com.google.gson.annotations.SerializedName
      fun setList(list: List<Pokemon>){
           this.pokemonList = list
      }
+
  }

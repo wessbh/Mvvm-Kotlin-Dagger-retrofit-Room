@@ -27,9 +27,10 @@ public class PokemoneViewModel: BaseViewModel() {
     fun getPokemonImageUrl(): String{
         return pokemonImagUrl
     }
+
     companion object{
         @JvmStatic
-        @BindingAdapter("bind:img")
+        @BindingAdapter("bind:imgUrl")
         fun loadImage(view: ImageView, imageUrl: String) {
             if (!imageUrl.isEmpty()) {
                 Picasso

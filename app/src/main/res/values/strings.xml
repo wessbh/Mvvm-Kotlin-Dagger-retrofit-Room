@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ProjectDaggerRetrofitMvvm</string>
+    <string name="app_name">Pokedex</string>
     <string name="retry">Retry</string>
     <string name="my_error">An error occurred while loading the posts</string>
 </resources>

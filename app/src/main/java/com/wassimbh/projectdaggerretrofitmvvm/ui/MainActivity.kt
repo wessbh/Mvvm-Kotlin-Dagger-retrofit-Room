@@ -1,6 +1,7 @@
 package com.wassimbh.projectdaggerretrofitmvvm.ui
 
 import android.os.Bundle
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -25,11 +26,12 @@ class MainActivity : AppCompatActivity() {
         )
         binding.myRecyclerView.layoutManager = GridLayoutManager(this, 2)
         binding.myRecyclerView.setHasFixedSize(true)
-        viewModel = ViewModelProviders.of(this, ViewModelFactory(this)).get(MainActivityViewModel::class.java)
+        viewModel = ViewModelProviders.of(this, ViewModelFactory()).get(MainActivityViewModel::class.java)
         viewModel.errorMessage.observe(this, Observer {
                 errorMessage -> if(errorMessage != null) showError(errorMessage) else hideError()
         })
         binding.viewModel = viewModel
+        showPoke()
     }
 
     private fun showError(@StringRes errorMessage:Int){
@@ -40,5 +42,22 @@ class MainActivity : AppCompatActivity() {
 
     private fun hideError(){
         errorSnackbar?.dismiss()
+    }
+    private fun showPoke(){
+        try {
+            viewModel.cardsList.observe(this, Observer {list->
+                if(list.isNotEmpty()){
+                    viewModel.onRetrieveCardsListFinish()
+                    Log.d("mriGel", "Done!!!"+list)
+                    viewModel.pokemonMutableLiveData.value = list
+                    viewModel.onRetrieveCardsListSuccess()
+                }
+                else
+                    viewModel.onRetrieveCardsListError()
+            })
+        }
+        catch (e: Throwable){
+            viewModel.onRetrieveCardsListError()
+        }
     }
 }

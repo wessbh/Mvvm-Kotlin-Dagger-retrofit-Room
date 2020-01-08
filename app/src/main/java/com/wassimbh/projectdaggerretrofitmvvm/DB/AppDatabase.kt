@@ -7,7 +7,7 @@ import com.wassimbh.projectdaggerretrofitmvvm.models.Pokemon
 import com.wassimbh.projectdaggerretrofitmvvm.utils.Converter
 
 
-@Database(entities = arrayOf(Pokemon::class), version = 1)
+@Database(entities = arrayOf(Pokemon::class), version = 1, exportSchema = false)
 @TypeConverters(Converter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun pokemonDao(): PokemonDao
