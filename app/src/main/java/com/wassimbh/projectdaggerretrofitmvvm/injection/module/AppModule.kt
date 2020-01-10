@@ -4,7 +4,7 @@ import com.wassimbh.projectdaggerretrofitmvvm.DB.AppDatabase
 import com.wassimbh.projectdaggerretrofitmvvm.DB.PokemonDao
 import com.wassimbh.projectdaggerretrofitmvvm.MyApplicationClass
 import com.wassimbh.projectdaggerretrofitmvvm.api.ApiServices
-import com.wassimbh.projectdaggerretrofitmvvm.repository.Repository
+import com.wassimbh.projectdaggerretrofitmvvm.repository.PokemonRepository
 import com.wassimbh.projectdaggerretrofitmvvm.utils.Constants
 import dagger.Module
 import dagger.Provides
@@ -44,7 +44,7 @@ object AppModule{
 
     @Provides
     @Singleton
-    internal fun provideRepository(apiServices: ApiServices, pokemonDao: PokemonDao): Repository{
-        return Repository(apiServices, pokemonDao)
+    internal fun provideRepository(apiServices: ApiServices, pokemonDao: PokemonDao): PokemonRepository{
+        return PokemonRepository(apiServices, pokemonDao)
     }
 }

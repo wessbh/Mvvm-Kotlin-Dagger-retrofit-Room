@@ -1,7 +1,7 @@
 package com.wassimbh.projectdaggerretrofitmvvm.injection.component
 
 import com.wassimbh.projectdaggerretrofitmvvm.injection.module.AppModule
-import com.wassimbh.projectdaggerretrofitmvvm.ui.MainActivityViewModel
+import com.wassimbh.projectdaggerretrofitmvvm.ui.activities.MainActivityViewModel
 import dagger.Component
 import javax.inject.Singleton
 

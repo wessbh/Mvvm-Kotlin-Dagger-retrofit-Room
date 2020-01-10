@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.wassimbh.projectdaggerretrofitmvvm.injection.component.DaggerViewModelInjector
 import com.wassimbh.projectdaggerretrofitmvvm.injection.component.ViewModelInjector
 import com.wassimbh.projectdaggerretrofitmvvm.injection.module.AppModule
-import com.wassimbh.projectdaggerretrofitmvvm.ui.MainActivityViewModel
+import com.wassimbh.projectdaggerretrofitmvvm.ui.activities.MainActivityViewModel
 
 abstract class BaseViewModel:ViewModel(){
 

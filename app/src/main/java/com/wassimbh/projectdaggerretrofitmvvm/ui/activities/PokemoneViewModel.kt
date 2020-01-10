@@ -1,4 +1,4 @@
-package com.wassimbh.projectdaggerretrofitmvvm.ui
+package com.wassimbh.projectdaggerretrofitmvvm.ui.activities
 
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
@@ -7,10 +7,12 @@ import com.squareup.picasso.Picasso
 import com.wassimbh.projectdaggerretrofitmvvm.base.BaseViewModel
 import com.wassimbh.projectdaggerretrofitmvvm.models.Pokemon
 
-public class PokemoneViewModel: BaseViewModel() {
+class PokemoneViewModel (): BaseViewModel() {
     private val pokemonName = MutableLiveData<String>()
     private val pokemonType = MutableLiveData<String>()
     private var pokemonImagUrl:String = ""
+
+
 
     fun bind(pokemon: Pokemon){
         pokemonName.value = pokemon.name
@@ -27,7 +29,6 @@ public class PokemoneViewModel: BaseViewModel() {
     fun getPokemonImageUrl(): String{
         return pokemonImagUrl
     }
-
     companion object{
         @JvmStatic
         @BindingAdapter("bind:imgUrl")

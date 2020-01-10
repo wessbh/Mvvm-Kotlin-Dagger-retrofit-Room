@@ -6,6 +6,6 @@ import androidx.room.Relation
 data class PokemonAndAttacks (
     @Embedded
     var pokemon: Pokemon,
-    @Relation(parentColumn = "id", entityColumn = "")
+    @Relation(parentColumn = "id", entityColumn = "name", entity = Attacks::class)
     var attackList: List<Attacks>
 )
