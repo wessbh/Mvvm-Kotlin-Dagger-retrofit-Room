@@ -1,4 +1,4 @@
-package com.wassimbh.projectdaggerretrofitmvvm.utils
+package com.wassimbh.projectdaggerretrofitmvvm.utils.listeners
 
 import com.wassimbh.projectdaggerretrofitmvvm.models.Pokemon
 

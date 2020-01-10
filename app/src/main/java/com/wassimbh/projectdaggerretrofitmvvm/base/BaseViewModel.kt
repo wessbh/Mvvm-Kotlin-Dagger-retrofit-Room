@@ -5,6 +5,8 @@ import com.wassimbh.projectdaggerretrofitmvvm.injection.component.DaggerViewMode
 import com.wassimbh.projectdaggerretrofitmvvm.injection.component.ViewModelInjector
 import com.wassimbh.projectdaggerretrofitmvvm.injection.module.AppModule
 import com.wassimbh.projectdaggerretrofitmvvm.ui.activities.MainActivityViewModel
+import com.wassimbh.projectdaggerretrofitmvvm.ui.fragments.DetailsViewModel
+import com.wassimbh.projectdaggerretrofitmvvm.ui.fragments.FragmentsViewModel
 
 abstract class BaseViewModel:ViewModel(){
 
@@ -20,6 +22,12 @@ abstract class BaseViewModel:ViewModel(){
     private fun inject() {
         when (this) {
             is MainActivityViewModel -> injector.inject(this)
+        }
+        when(this){
+            is FragmentsViewModel -> injector.inject(this)
+        }
+        when(this){
+            is DetailsViewModel -> injector.inject(this)
         }
     }
 

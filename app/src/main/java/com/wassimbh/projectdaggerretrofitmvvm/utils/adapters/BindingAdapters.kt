@@ -1,4 +1,4 @@
-package com.wassimbh.projectdaggerretrofitmvvm.utils
+package com.wassimbh.projectdaggerretrofitmvvm.utils.adapters
 
 import android.view.View
 import android.widget.TextView

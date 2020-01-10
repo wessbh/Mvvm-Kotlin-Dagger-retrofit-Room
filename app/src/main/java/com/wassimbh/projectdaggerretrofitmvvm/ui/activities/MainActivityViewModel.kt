@@ -11,7 +11,7 @@ import com.wassimbh.projectdaggerretrofitmvvm.base.BaseViewModel
 import com.wassimbh.projectdaggerretrofitmvvm.models.Attacks
 import com.wassimbh.projectdaggerretrofitmvvm.models.Pokemon
 import com.wassimbh.projectdaggerretrofitmvvm.repository.PokemonRepository
-import com.wassimbh.projectdaggerretrofitmvvm.utils.CardsRecyclerViewAdapter
+import com.wassimbh.projectdaggerretrofitmvvm.utils.adapters.CardsRecyclerViewAdapter
 import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
@@ -27,7 +27,8 @@ class MainActivityViewModel: BaseViewModel(){
 
 
     private lateinit var subscription: Disposable
-    val pokemonListAdapter: CardsRecyclerViewAdapter = CardsRecyclerViewAdapter()
+    val pokemonListAdapter: CardsRecyclerViewAdapter =
+        CardsRecyclerViewAdapter()
     val pokemonMutableLiveData: MutableLiveData<List<Pokemon>> = MutableLiveData()
     val attacksMutableLiveData: MutableLiveData<List<Attacks>> = MutableLiveData()
     val errorMessage:MutableLiveData<Int> = MutableLiveData()

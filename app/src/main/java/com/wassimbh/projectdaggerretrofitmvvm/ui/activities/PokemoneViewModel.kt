@@ -12,8 +12,6 @@ class PokemoneViewModel (): BaseViewModel() {
     private val pokemonType = MutableLiveData<String>()
     private var pokemonImagUrl:String = ""
 
-
-
     fun bind(pokemon: Pokemon){
         pokemonName.value = pokemon.name
         pokemonType.value = pokemon.types[0]

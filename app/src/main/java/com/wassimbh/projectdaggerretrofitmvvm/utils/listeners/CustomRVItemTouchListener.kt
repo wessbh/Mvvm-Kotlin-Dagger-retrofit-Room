@@ -1,13 +1,13 @@
-package com.wassimbh.projectdaggerretrofitmvvm.utils
+package com.wassimbh.projectdaggerretrofitmvvm.utils.listeners
 import android.content.Context
 import android.view.GestureDetector
 import android.view.MotionEvent
 import androidx.recyclerview.widget.RecyclerView
 
-class CustomRVItemTouchListener(context:Context, recyclerView: RecyclerView, clickListener:RecyclerViewItemClickListener):RecyclerView.OnItemTouchListener {
+class CustomRVItemTouchListener(context:Context, recyclerView: RecyclerView, clickListener: RecyclerViewItemClickListener):RecyclerView.OnItemTouchListener {
     //GestureDetector to intercept touch events
     internal var gestureDetector:GestureDetector
-    private val clickListener:RecyclerViewItemClickListener
+    private val clickListener: RecyclerViewItemClickListener
     init{
         this.clickListener = clickListener
         gestureDetector = GestureDetector(context, object:GestureDetector.SimpleOnGestureListener() {

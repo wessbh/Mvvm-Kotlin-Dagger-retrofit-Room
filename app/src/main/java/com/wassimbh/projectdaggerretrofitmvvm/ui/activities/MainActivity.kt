@@ -1,91 +1,35 @@
 package com.wassimbh.projectdaggerretrofitmvvm.ui.activities
 
 import android.os.Bundle
-import android.widget.Toast
-import androidx.annotation.StringRes
+import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.widget.GridLayoutManager
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.snackbar.Snackbar
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import com.wassimbh.projectdaggerretrofitmvvm.R
-import com.wassimbh.projectdaggerretrofitmvvm.databinding.ActivityMainBinding
-import com.wassimbh.projectdaggerretrofitmvvm.injection.ViewModelFactory
-import com.wassimbh.projectdaggerretrofitmvvm.utils.PokemonBus
+import com.wassimbh.projectdaggerretrofitmvvm.ui.fragments.PokemonListFragment
+import com.wassimbh.projectdaggerretrofitmvvm.utils.eventbus.PokemonBus
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMainBinding
-    private lateinit var viewModel: MainActivityViewModel
-    private var errorSnackbar: Snackbar? = null
+    private lateinit var fragmentManager: FragmentManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        binding = DataBindingUtil.setContentView(
-            this,
-            R.layout.activity_main
-        )
-        binding.myRecyclerView.layoutManager = GridLayoutManager(this, 2)
-        binding.myRecyclerView.setHasFixedSize(true)
-       /* binding.myRecyclerView.addOnItemTouchListener(CustomRVItemTouchListener(applicationContext, binding.myRecyclerView,object : RecyclerViewItemClickListener{
-            override fun onClick(view: View, position: Int) {
-                viewModel.cardsList.observe(this@MainActivity, Observer {list->
-                    val pokemon = list[position]
-                    val attacks = viewModel.attacksList(pokemon.id)
-                    attacks.observe(this@MainActivity, Observer {attacksList->
-                        val attack = attacksList[0]
-                        showDialog()
-                    })
-                })
-            }
-
-            override fun onLongClick(view: View, position: Int) {
-            }
-
-        }))*/
-        viewModel = ViewModelProviders.of(this, ViewModelFactory()).get(MainActivityViewModel::class.java)
-        viewModel.errorMessage.observe(this, Observer { errorMessage ->
-            if (errorMessage != null) showError(errorMessage) else hideError()
-        })
-        binding.viewModel = viewModel
-        showPoke()
+        fragmentManager = supportFragmentManager
+        val e= findViewById<FrameLayout>(R.id.framelayout)
+        changeFragment(PokemonListFragment())
     }
-    private fun showDialog(){
-        val view = layoutInflater.inflate(R.layout.bottom_sheet_dialog, null)
-        val dialog = BottomSheetDialog(this)
-        dialog.setContentView(view)
-        dialog.show()
-    }
-    private fun showError(@StringRes errorMessage:Int){
-        errorSnackbar = Snackbar.make(binding.root, errorMessage, Snackbar.LENGTH_INDEFINITE)
-        errorSnackbar?.setAction(R.string.retry, viewModel.errorClickListener)
-        errorSnackbar?.show()
+    fun changeFragment(fragment: Fragment){
+        val transaction: FragmentTransaction = fragmentManager.beginTransaction()
+        transaction.add(R.id.framelayout, fragment)
+        transaction.addToBackStack(null)
+        transaction.commit()
     }
 
-    private fun hideError(){
-        errorSnackbar?.dismiss()
-    }
-    private fun showPoke(){
-        try {
-            viewModel.cardsList.observe(this, Observer {list->
-                if(list.isNotEmpty()){
-                    viewModel.onRetrieveCardsListFinish()
-                    viewModel.pokemonMutableLiveData.value = list
-                    viewModel.onRetrieveCardsListSuccess()
-                }
-                else
-                    viewModel.onRetrieveCardsListError()
-            })
-        }
-        catch (e: Throwable){
-            viewModel.onRetrieveCardsListError()
-        }
-    }
 
     @Override
     override fun onStart() {
@@ -101,7 +45,8 @@ class MainActivity : AppCompatActivity() {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onEventFired(event: PokemonBus){
-        Toast.makeText(applicationContext,  event.pokemon.name+" - " + event.eventFrom, Toast.LENGTH_SHORT).show()
+       /* val e= findViewById<FrameLayout>(R.id.framelayout)
+        val detailFragment: DetailFragment = DetailFragment.newInstance(event.pokemon)
+        changeFragment(detailFragment)*/
     }
-
 }

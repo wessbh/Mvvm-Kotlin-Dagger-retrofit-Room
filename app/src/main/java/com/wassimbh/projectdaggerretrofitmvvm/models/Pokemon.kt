@@ -5,6 +5,7 @@ import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 @Entity
  data class Pokemon (
@@ -30,7 +31,7 @@ import com.google.gson.annotations.SerializedName
     @Ignore
     @SerializedName("attacks")
     var attacks: List<Attacks>
-){
+) : Serializable {
 
    constructor(): this("", "", "", "", "", arrayOf<String>(), listOf<Attacks>() )
 
