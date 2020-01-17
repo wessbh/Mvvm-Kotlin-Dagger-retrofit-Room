@@ -1,9 +1,6 @@
-package com.wassimbh.projectdaggerretrofitmvvm.ui.activities
+package com.wassimbh.projectdaggerretrofitmvvm.ui.fragments
 
-import android.widget.ImageView
-import androidx.databinding.BindingAdapter
 import androidx.lifecycle.MutableLiveData
-import com.squareup.picasso.Picasso
 import com.wassimbh.projectdaggerretrofitmvvm.base.BaseViewModel
 import com.wassimbh.projectdaggerretrofitmvvm.models.Pokemon
 
@@ -26,17 +23,5 @@ class PokemoneViewModel (): BaseViewModel() {
     }
     fun getPokemonImageUrl(): String{
         return pokemonImagUrl
-    }
-    companion object{
-        @JvmStatic
-        @BindingAdapter("bind:imgUrl")
-        fun loadImage(view: ImageView, imageUrl: String) {
-            if (!imageUrl.isEmpty()) {
-                Picasso
-                    .get()
-                    .load(imageUrl)
-                    .into(view)
-            }
-        }
     }
 }

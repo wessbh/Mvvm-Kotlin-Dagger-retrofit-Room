@@ -5,19 +5,18 @@ import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.wassimbh.projectdaggerretrofitmvvm.DB.PokemonDao
-import com.wassimbh.projectdaggerretrofitmvvm.R
 import com.wassimbh.projectdaggerretrofitmvvm.api.ApiServices
 import com.wassimbh.projectdaggerretrofitmvvm.base.BaseViewModel
 import com.wassimbh.projectdaggerretrofitmvvm.models.Attacks
 import com.wassimbh.projectdaggerretrofitmvvm.models.Pokemon
 import com.wassimbh.projectdaggerretrofitmvvm.repository.PokemonRepository
+import com.wassimbh.projectdaggerretrofitmvvm.utils.adapters.AttacksAdapter
 import com.wassimbh.projectdaggerretrofitmvvm.utils.adapters.CardsRecyclerViewAdapter
-import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
 class MainActivityViewModel: BaseViewModel(){
-    val loadingVisibility: MutableLiveData<Int> = MutableLiveData()
 
+    val loadingVisibility: MutableLiveData<Int> = MutableLiveData()
     @Inject
     lateinit var apiServices: ApiServices
     @Inject
@@ -26,44 +25,42 @@ class MainActivityViewModel: BaseViewModel(){
     lateinit var pokemonRepository: PokemonRepository
 
 
-    private lateinit var subscription: Disposable
-    val pokemonListAdapter: CardsRecyclerViewAdapter =
-        CardsRecyclerViewAdapter()
+    val pokemonListAdapter: CardsRecyclerViewAdapter = CardsRecyclerViewAdapter()
+    val attacksAdapter: AttacksAdapter = AttacksAdapter()
     val pokemonMutableLiveData: MutableLiveData<List<Pokemon>> = MutableLiveData()
     val attacksMutableLiveData: MutableLiveData<List<Attacks>> = MutableLiveData()
-    val errorMessage:MutableLiveData<Int> = MutableLiveData()
+
+    val errorMessage: MutableLiveData<Int> = MutableLiveData()
     val errorClickListener = View.OnClickListener {  }
     init{
         onRetrieveCardsListStart()
+        Log.d("mriGel", "View Model Created")
     }
 
-    val cardsList: LiveData<List<Pokemon>> = pokemonRepository.geCardsList()
-    fun attacksList(pokemon_id: String) :LiveData<List<Attacks>>{
-        val attacks: LiveData<List<Attacks>> = pokemonRepository.gettAttacks(pokemon_id)
-
-       return attacks
+    fun cardsList(): LiveData<List<Pokemon>> {
+        return  pokemonRepository.getCardsList()
     }
-     private fun onRetrieveCardsListStart(){
+
+    fun cardsListType(type: String): LiveData<List<Pokemon>> {
+        return  pokemonRepository.getCardsListType(type)
+    }
+    fun cardsListTypeOffline(type: String): LiveData<List<Pokemon>> {
+        return  pokemonRepository.getCardsListTypeOffline(type)
+    }
+
+
+    private fun onRetrieveCardsListStart(){
         loadingVisibility.value = View.VISIBLE
     }
-
-     fun onRetrieveCardsListFinish(){
+    fun onRetrieveCardsListFinish(){
         loadingVisibility.value = View.GONE
         errorMessage.value = null
     }
 
-     fun onRetrieveCardsListSuccess(){
-        Log.d("mriGel", "Done!")
-       pokemonListAdapter.updateCardList(pokemonMutableLiveData.value!!)
+    fun onRetrieveCardsListError(msgError: Int){
+        errorMessage.value = msgError
     }
-
-     fun onRetrieveCardsListError(){
-        errorMessage.value =
-            R.string.my_error
-    }
-
     override fun onCleared() {
         super.onCleared()
-        subscription.dispose()
     }
 }

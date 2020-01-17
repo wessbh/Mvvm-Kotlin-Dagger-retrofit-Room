@@ -1,12 +1,14 @@
 package com.wassimbh.projectdaggerretrofitmvvm.utils.adapters
 
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
+import com.squareup.picasso.Picasso
 import com.wassimbh.projectdaggerretrofitmvvm.utils.extension.getParentActivity
 
 @BindingAdapter("adapter")
@@ -27,5 +29,15 @@ fun setMutableText(view: TextView, text: MutableLiveData<String>?) {
     val parentActivity: AppCompatActivity? = view.getParentActivity()
     if (parentActivity != null && text != null) {
         text.observe(parentActivity, Observer { value -> view.text = value ?: "" })
+    }
+}
+
+@BindingAdapter("android:src")
+fun loadImage(view: ImageView, imageUrl: String) {
+    if (!imageUrl.isEmpty()) {
+        Picasso
+            .get()
+            .load(imageUrl)
+            .into(view)
     }
 }

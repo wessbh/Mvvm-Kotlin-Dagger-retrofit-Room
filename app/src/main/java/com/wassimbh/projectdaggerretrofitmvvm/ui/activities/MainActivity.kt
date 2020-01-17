@@ -1,52 +1,104 @@
 package com.wassimbh.projectdaggerretrofitmvvm.ui.activities
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.Bundle
-import android.widget.FrameLayout
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.ViewModelProviders
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.play.core.splitinstall.SplitInstallManager
+import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
+import com.google.android.play.core.splitinstall.SplitInstallRequest
 import com.wassimbh.projectdaggerretrofitmvvm.R
-import com.wassimbh.projectdaggerretrofitmvvm.ui.fragments.PokemonListFragment
-import com.wassimbh.projectdaggerretrofitmvvm.utils.eventbus.PokemonBus
-import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
+import com.wassimbh.projectdaggerretrofitmvvm.injection.ViewModelFactory
+import com.wassimbh.projectdaggerretrofitmvvm.ui.fragments.ViewPagerFragment
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var fragmentManager: FragmentManager
+
+    private lateinit var splitInstallManager : SplitInstallManager
+
+    lateinit var viewModel: MainActivityViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        fragmentManager = supportFragmentManager
-        val e= findViewById<FrameLayout>(R.id.framelayout)
-        changeFragment(PokemonListFragment())
+        viewModel = ViewModelProviders.of(this, ViewModelFactory()).get(MainActivityViewModel::class.java)
+        changeFragment(ViewPagerFragment())
+        val bottom_navigation = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        bottom_navigation.setOnNavigationItemSelectedListener(myNavigationItemSelectedListener)
+        installDFM()
+    }
+    private val myNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
+        when (item.itemId) {
+            R.id.pokedex -> {
+                changeFragment(ViewPagerFragment())
+                Toast.makeText(applicationContext, "This is pokedex", Toast.LENGTH_SHORT).show()
+            }
+            R.id.home -> {
+                val feature_name: String = "mytestdynamicfeature"
+                if (splitInstallManager.installedModules.contains(feature_name)) {
+                    changeFragment(loadFragment(feature_name,"DfmFragment"))
+                } else {
+                    Toast.makeText(applicationContext, "DFM failed, shit !", Toast.LENGTH_SHORT).show()
+                }
+                Toast.makeText(applicationContext, "This is Home sweet home", Toast.LENGTH_SHORT).show()
+            }
+        }
+        false
     }
     fun changeFragment(fragment: Fragment){
-        val transaction: FragmentTransaction = fragmentManager.beginTransaction()
-        transaction.add(R.id.framelayout, fragment)
-        transaction.addToBackStack(null)
-        transaction.commit()
+        supportFragmentManager
+            .beginTransaction()
+            .setCustomAnimations(R.anim.design_bottom_sheet_slide_in, R.anim.design_bottom_sheet_slide_out)
+            .replace(R.id.frame_container, fragment)
+            .addToBackStack(null)
+            .commit()
+    }
+    private fun installDFM() {
+        /*val sdCard: File = application!!.getExternalFilesDir(null)!!
+        val file = File(sdCard, "splits")*/
+        splitInstallManager = SplitInstallManagerFactory.create(applicationContext)
+        val request = SplitInstallRequest.newBuilder()
+            .addModule("myseconddynamicfeature")
+            .build()
+
+        splitInstallManager.startInstall(request)
+            .addOnSuccessListener {
+                Toast.makeText(applicationContext, "DFM installed", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener {
+                Toast.makeText(applicationContext, "DFM failed, shit !", Toast.LENGTH_SHORT).show()
+            }
+    }
+    private fun loadFragment(feature_name: String, fragment_name: String): Fragment{
+        return Class.forName("com.wassimbh."+feature_name+"."+fragment_name).newInstance() as Fragment
     }
 
-
-    @Override
-    override fun onStart() {
-        super.onStart()
-        EventBus.getDefault().register(this)
+    override fun onBackPressed() {
+        super.onBackPressed()
     }
 
-    @Override
-    override fun onStop() {
-        super.onStop()
-        EventBus.getDefault().unregister(this)
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onEventFired(event: PokemonBus){
-       /* val e= findViewById<FrameLayout>(R.id.framelayout)
-        val detailFragment: DetailFragment = DetailFragment.newInstance(event.pokemon)
-        changeFragment(detailFragment)*/
+    fun checkNetworkState(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val nw = connectivityManager.activeNetwork ?: return false
+            val actNw = connectivityManager.getNetworkCapabilities(nw) ?: return false
+            return when {
+                actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+                actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+                else -> false
+            }
+        } else {
+            val nwInfo = connectivityManager.activeNetworkInfo ?: return false
+            return nwInfo.isConnected
+        }
     }
 }
+/*
+val pokemon = Pokemon("xy11-25","Volcanion", "721", "imageUrl\":\"https://images.pokemontcg.io/xy11/25.png",
+    "imageUrlHiRes\":\"https://images.pokemontcg.io/xy11/volcano.png",
+    arrayOf("Fire"),listOf<Attacks>())*/

@@ -36,6 +36,7 @@ object AppModule{
     internal fun provideDao(db: AppDatabase): PokemonDao {
         return db.pokemonDao()
     }
+
     @Provides
     @Singleton
      internal fun provideRoomDatabase(): AppDatabase{

@@ -5,27 +5,27 @@
     <data>
         <variable
             name="viewModel"
-            type="com.wassimbh.projectdaggerretrofitmvvm.ui.fragments.FragmentsViewModel" />
+            type="com.wassimbh.projectdaggerretrofitmvvm.ui.activities.MainActivityViewModel" />
     </data>
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <RelativeLayout
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:id="@+id/listFragmentLayout">
 
         <ProgressBar
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:mutableVisibility="@{viewModel.getLoadingVisibility()}"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:mutableVisibility="@{viewModel.loadingVisibility}"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"/>
+
         <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:id="@+id/myRecyclerView"
-            app:adapter="@{viewModel.pokemonListAdapter}">
-        </androidx.recyclerview.widget.RecyclerView>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:nestedScrollingEnabled="false"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"/>
+    </RelativeLayout>
 </layout>

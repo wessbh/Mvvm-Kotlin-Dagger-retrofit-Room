@@ -12,7 +12,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
 import com.wassimbh.projectdaggerretrofitmvvm.R
@@ -21,13 +21,12 @@ import com.wassimbh.projectdaggerretrofitmvvm.injection.ViewModelFactory
 import com.wassimbh.projectdaggerretrofitmvvm.models.Attacks
 import com.wassimbh.projectdaggerretrofitmvvm.models.Pokemon
 import com.wassimbh.projectdaggerretrofitmvvm.utils.eventbus.PokemonBus
+import kotlinx.android.synthetic.main.fragment_detail.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
-/**
- * A simple [Fragment] subclass.
- */
+
 class DetailFragment: Fragment() {
     lateinit var pokemon: Pokemon
     lateinit var attacks: Attacks
@@ -36,15 +35,12 @@ class DetailFragment: Fragment() {
     lateinit var myContext: Context
     private var errorSnackbar: Snackbar? = null
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_detail, container, false)
-        binding = DataBindingUtil.setContentView(activity!!, R.layout.fragment_detail)
-        binding.myRecyclerView.layoutManager = GridLayoutManager(myContext, 2)
+    override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_detail, container, false)
+        binding.myRecyclerView.layoutManager = LinearLayoutManager(myContext)
         binding.myRecyclerView.setHasFixedSize(true)
         viewModel = ViewModelProviders.of(this, ViewModelFactory()).get(DetailsViewModel::class.java)
+        viewModel.onRetrieveAttacksListStart()
         viewModel.errorMessage.observe(this, Observer { errorMessage ->
             if (errorMessage != null) showError(errorMessage) else hideError()
         })
@@ -52,10 +48,14 @@ class DetailFragment: Fragment() {
             .get()
             .load(pokemon.imageUrl)
             .into(binding.pokeImg)
-        binding.pokeName.text = pokemon.name
+        binding.pokeName.text = "Name: "+pokemon.name
         binding.viewModel = viewModel
         showAttacks()
-        return view
+        return binding.root
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
     }
 
     companion object {
@@ -69,14 +69,19 @@ class DetailFragment: Fragment() {
 
     fun showAttacks(){
         viewModel.attacksList(pokemon.id).observe(this, Observer{list->
-            viewModel.attacksMutableLiveData.value = list!!
-            viewModel.onRetrieveAttacksListStart()
-            viewModel.onRetrieveAttakcsListSuccess()
-            viewModel.onRetrieveAttakcsListFinish()
+            if(list.isNotEmpty()){
+                viewModel.onRetrieveAttakcsListFinish()
+                viewModel.attacksMutableLiveData.value = list
+                viewModel.onRetrieveAttakcsListSuccess()
+            }
+            else{
+                viewModel.onRetrieveAttakcsListFinish()
+                viewModel.onRetrieveAttacksListError(R.string.list_attacks_empty)
+            }
         })
     }
     private fun showError(@StringRes errorMessage:Int){
-        errorSnackbar = Snackbar.make(binding.root, errorMessage, Snackbar.LENGTH_INDEFINITE)
+        errorSnackbar = Snackbar.make(detailFragmentConstraint, errorMessage, Snackbar.LENGTH_SHORT)
         errorSnackbar?.setAction(R.string.retry, viewModel.errorClickListener)
         errorSnackbar?.show()
     }
@@ -89,13 +94,12 @@ class DetailFragment: Fragment() {
         myContext = activity!!
         pokemon = arguments?.getSerializable("pokemon") as Pokemon
     }
-    @Override
+
     override fun onStart() {
         super.onStart()
         EventBus.getDefault().register(this)
     }
 
-    @Override
     override fun onStop() {
         super.onStop()
         EventBus.getDefault().unregister(this)

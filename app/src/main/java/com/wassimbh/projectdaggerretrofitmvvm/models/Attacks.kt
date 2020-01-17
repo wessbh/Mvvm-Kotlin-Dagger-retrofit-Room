@@ -22,7 +22,7 @@ data class Attacks (
     var text: String,
     @Expose
     @SerializedName("damage")
-    var damage: String,
+    var damage: String?,
     @Expose
     @SerializedName("convertedEnergyCost")
     var convertedEnergyCost: Int

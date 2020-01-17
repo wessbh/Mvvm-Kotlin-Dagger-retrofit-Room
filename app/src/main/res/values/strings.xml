@@ -1,8 +1,12 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Pokedex</string>
     <string name="retry">Retry</string>
     <string name="my_error">An error occurred while loading the posts</string>
+    <string name="list_attacks_empty">"There's no attacks, Sorry :("</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="transition_avatar_main_to_detail" tools:ignore="ExtraTranslation">transition_avatar_main_to_detail</string>
+    <string name="title_mytestdynamicfeature">My Dynamic Feature</string>
+    <string name="title_myseconddynamicfeature">Second Dynamic Feature</string>
+
 </resources>

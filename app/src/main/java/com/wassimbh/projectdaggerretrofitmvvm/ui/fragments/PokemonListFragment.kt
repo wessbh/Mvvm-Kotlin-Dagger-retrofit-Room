@@ -3,7 +3,6 @@ package com.wassimbh.projectdaggerretrofitmvvm.ui.fragments
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,17 +10,16 @@ import androidx.annotation.StringRes
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.wassimbh.projectdaggerretrofitmvvm.R
 import com.wassimbh.projectdaggerretrofitmvvm.databinding.FragmentPokemonListBinding
-import com.wassimbh.projectdaggerretrofitmvvm.injection.ViewModelFactory
 import com.wassimbh.projectdaggerretrofitmvvm.models.Pokemon
 import com.wassimbh.projectdaggerretrofitmvvm.ui.activities.MainActivity
+import com.wassimbh.projectdaggerretrofitmvvm.ui.activities.MainActivityViewModel
+import com.wassimbh.projectdaggerretrofitmvvm.utils.adapters.CardsRecyclerViewAdapter
 import com.wassimbh.projectdaggerretrofitmvvm.utils.eventbus.PokemonBus
-import com.wassimbh.projectdaggerretrofitmvvm.utils.listeners.CustomRVItemTouchListener
-import com.wassimbh.projectdaggerretrofitmvvm.utils.listeners.RecyclerViewItemClickListener
+import kotlinx.android.synthetic.main.fragment_pokemon_list.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -29,56 +27,65 @@ import org.greenrobot.eventbus.ThreadMode
 
 class PokemonListFragment : Fragment() {
     lateinit var pokemon: Pokemon
-    lateinit var myContext: Context
+    lateinit var type: String
+    lateinit var pokemonListAdapter: CardsRecyclerViewAdapter
     private lateinit var binding: FragmentPokemonListBinding
-    private lateinit var viewModel: FragmentsViewModel
+    private lateinit var viewModel: MainActivityViewModel
     private var errorSnackbar: Snackbar? = null
+    lateinit var myActivity: MainActivity
 
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
-        val view = inflater.inflate(R.layout.fragment_pokemon_list, container, false)
-        binding = DataBindingUtil.setContentView(activity!!, R.layout.fragment_pokemon_list)
-        binding.myRecyclerView.layoutManager = GridLayoutManager(myContext, 2)
+        pokemonListAdapter = CardsRecyclerViewAdapter()
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_pokemon_list, container, false)
+        binding.myRecyclerView.layoutManager = GridLayoutManager(myActivity.applicationContext, 3)
         binding.myRecyclerView.setHasFixedSize(true)
-        viewModel = ViewModelProviders.of(this, ViewModelFactory()).get(FragmentsViewModel::class.java)
+        binding.myRecyclerView.adapter = pokemonListAdapter
+        val activity = activity!! as MainActivity
+        viewModel = activity.viewModel
         viewModel.errorMessage.observe(this, Observer { errorMessage ->
             if (errorMessage != null) showError(errorMessage) else hideError()
         })
-        binding.myRecyclerView.addOnItemTouchListener(CustomRVItemTouchListener(activity!!, binding.myRecyclerView, object :
-            RecyclerViewItemClickListener {
-            override fun onClick(view: View, position: Int) {
-                val myActivity: MainActivity = activity!! as MainActivity
-                val detailFragment: DetailFragment = DetailFragment.newInstance(Pokemon())
-                myActivity.changeFragment(detailFragment)
-            }
-
-            override fun onLongClick(view: View, position: Int) {
-            }
-        }))
         binding.viewModel = viewModel
+
         showPoke()
 
-        return view
+        return binding.root
     }
 
     private fun showPoke(){
-        try {
-            viewModel.cardsList.observe(this, Observer {list->
+        if(myActivity.checkNetworkState(myActivity.applicationContext)){
+            viewModel.cardsListType(type).observe(this, Observer {list->
                 if(list.isNotEmpty()){
                     viewModel.onRetrieveCardsListFinish()
+                    viewModel.loadingVisibility.value = View.GONE
                     viewModel.pokemonMutableLiveData.value = list
-                    viewModel.onRetrieveCardsListSuccess()
+                    pokemonListAdapter.updateCardList(list)
                 }
-                else
-                    viewModel.onRetrieveCardsListError()
+                else{
+                    viewModel.onRetrieveCardsListFinish()
+                    viewModel.loadingVisibility.value = View.GONE
+                    viewModel.onRetrieveCardsListError(R.string.my_error)
+                }
             })
         }
-        catch (e: Throwable){
-            viewModel.onRetrieveCardsListError()
+        else{
+            viewModel.cardsListTypeOffline(type).observe(this, Observer {list->
+                if(list.isNotEmpty()){
+                    viewModel.onRetrieveCardsListFinish()
+                    viewModel.loadingVisibility.value = View.GONE
+                    viewModel.pokemonMutableLiveData.value = list
+                    pokemonListAdapter.updateCardList(list)
+                }
+                else{
+                    viewModel.onRetrieveCardsListFinish()
+                    viewModel.loadingVisibility.value = View.GONE
+                    viewModel.onRetrieveCardsListError(R.string.my_error)
+                }
+            })
         }
     }
     private fun showError(@StringRes errorMessage:Int){
-        errorSnackbar = Snackbar.make(binding.root, errorMessage, Snackbar.LENGTH_INDEFINITE)
-        errorSnackbar?.setAction(R.string.retry, viewModel.errorClickListener)
+        errorSnackbar = Snackbar.make(listFragmentLayout, errorMessage, Snackbar.LENGTH_SHORT)
         errorSnackbar?.show()
     }
 
@@ -86,13 +93,11 @@ class PokemonListFragment : Fragment() {
         errorSnackbar?.dismiss()
     }
 
-    @Override
     override fun onStart() {
         super.onStart()
         EventBus.getDefault().register(this)
     }
 
-    @Override
     override fun onStop() {
         super.onStop()
         EventBus.getDefault().unregister(this)
@@ -100,21 +105,25 @@ class PokemonListFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        myContext = activity!!
+        myActivity = activity!! as MainActivity
+        type = arguments?.getString("type") as String
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onEventFired(event: PokemonBus){
-        Log.d("mriGel?!", event.pokemon.toString())
         pokemon = event.pokemon
-       /* val detailFragment: DetailFragment = DetailFragment.newInstance(event.pokemon)
-        Log.d("mriGel?!", event.pokemon.toString())*/
-       // val myActivity: MainActivity = activity!! as MainActivity
-       // myActivity.changeFragment(detailFragment)
-        /*val transaction: FragmentTransaction =childFragmentManager.beginTransaction()
-        transaction.add(R.id.framelayout2, detailFragment)
-        transaction.addToBackStack(null)
-        transaction.commit()*/
+       val detailFragment: DetailFragment = DetailFragment.newInstance(event.pokemon)
+        myActivity.changeFragment(detailFragment)
     }
+
+    companion object {
+        @JvmStatic
+        fun newInstance(type: String) = PokemonListFragment().apply {
+            arguments = Bundle().apply {
+                putString("type", type)
+            }
+        }
+    }
+
 
 }

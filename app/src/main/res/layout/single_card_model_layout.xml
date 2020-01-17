@@ -4,9 +4,9 @@
     <data>
         <variable
             name="viewmodel"
-            type="com.wassimbh.projectdaggerretrofitmvvm.ui.activities.PokemoneViewModel" />
-
+            type="com.wassimbh.projectdaggerretrofitmvvm.ui.fragments.PokemoneViewModel"/>
     </data>
+
     <androidx.cardview.widget.CardView
         android:id="@+id/card_view"
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
@@ -15,23 +15,28 @@
         card_view:cardBackgroundColor="@color/white"
         card_view:cardCornerRadius="10dp"
         card_view:cardUseCompatPadding="true">
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         xmlns:app="http://schemas.android.com/apk/res-auto">
 
         <ImageView
             android:id="@+id/img"
             android:layout_width="0dp"
-            android:layout_height="300dp"
+            android:layout_height="0dp"
+            app:layout_constraintDimensionRatio="1:1"
+            android:scaleType="centerCrop"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            bind:imgUrl="@{viewmodel.pokemonImageUrl}"
+            android:src="@{viewmodel.pokemonImageUrl}"
             />
         <View android:id="@+id/black_rectangle"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
+            android:layout_height="0dp"
+            app:layout_constraintHeight_default="percent"
+            app:layout_constraintHeight_percent=".3"
             android:background="#80000000"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="@id/img"
@@ -55,7 +60,7 @@
                 android:textColor="@color/white"
                 android:layout_marginStart="15dp"
                 android:layout_marginEnd="15dp"
-                android:textSize="17sp"
+                android:textSize="12sp"
                 android:layout_alignParentStart="true"
                 android:text="this is a text"
                 />
@@ -70,7 +75,7 @@
                 android:textColor="@color/white"
                 android:layout_marginStart="15dp"
                 android:layout_marginEnd="15dp"
-                android:textSize="14sp"
+                android:textSize="8sp"
                 android:layout_below="@+id/name"
                 android:layout_alignParentStart="true"
                 android:text="this is a text"

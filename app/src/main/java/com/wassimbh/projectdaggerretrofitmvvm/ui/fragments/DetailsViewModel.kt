@@ -5,7 +5,6 @@ import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.wassimbh.projectdaggerretrofitmvvm.DB.PokemonDao
-import com.wassimbh.projectdaggerretrofitmvvm.R
 import com.wassimbh.projectdaggerretrofitmvvm.api.ApiServices
 import com.wassimbh.projectdaggerretrofitmvvm.base.BaseViewModel
 import com.wassimbh.projectdaggerretrofitmvvm.models.Attacks
@@ -13,7 +12,7 @@ import com.wassimbh.projectdaggerretrofitmvvm.repository.PokemonRepository
 import com.wassimbh.projectdaggerretrofitmvvm.utils.adapters.AttacksAdapter
 import javax.inject.Inject
 
-class DetailsViewModel (): BaseViewModel() {
+class DetailsViewModel : BaseViewModel() {
 
     @Inject
     lateinit var apiServices: ApiServices
@@ -31,7 +30,7 @@ class DetailsViewModel (): BaseViewModel() {
     }
 
     fun attacksList(pokemon_id: String) : LiveData<List<Attacks>> {
-        val attacks: LiveData<List<Attacks>> = pokemonRepository.gettAttacks(pokemon_id)
+        val attacks: LiveData<List<Attacks>> = pokemonRepository.getAttacks(pokemon_id)
 
         return attacks
     }
@@ -42,11 +41,10 @@ class DetailsViewModel (): BaseViewModel() {
     }
 
 
-    fun onRetrieveAttacksListError(){
-        errorMessage.value =
-            R.string.my_error
+    fun onRetrieveAttacksListError(msgError :Int){
+        errorMessage.value = msgError
     }
-    fun onRetrieveAttakcsListSuccess(){
+     fun onRetrieveAttakcsListSuccess(){
         Log.d("mriGel", "Done!")
         attacksAdapter.updateCardList(attacksMutableLiveData.value!!)
     }

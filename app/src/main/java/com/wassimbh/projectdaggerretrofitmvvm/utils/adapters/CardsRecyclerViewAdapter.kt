@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.wassimbh.projectdaggerretrofitmvvm.R
 import com.wassimbh.projectdaggerretrofitmvvm.databinding.SingleCardModelLayoutBinding
 import com.wassimbh.projectdaggerretrofitmvvm.models.Pokemon
-import com.wassimbh.projectdaggerretrofitmvvm.ui.activities.PokemoneViewModel
+import com.wassimbh.projectdaggerretrofitmvvm.ui.fragments.PokemoneViewModel
 import com.wassimbh.projectdaggerretrofitmvvm.utils.eventbus.PokemonBus
 import org.greenrobot.eventbus.EventBus
 
@@ -29,22 +29,6 @@ class CardsRecyclerViewAdapter: RecyclerView.Adapter<CardsRecyclerViewAdapter.Vi
                     PokemonBus(
                         pokemon,
                         "image"
-                    )
-                )
-            })
-            holder.binding.type.setOnClickListener(View.OnClickListener {
-                EventBus.getDefault().post(
-                    PokemonBus(
-                        pokemon,
-                        "type"
-                    )
-                )
-            })
-            holder.binding.name.setOnClickListener(View.OnClickListener {
-                EventBus.getDefault().post(
-                    PokemonBus(
-                        pokemon,
-                        "name"
                     )
                 )
             })
